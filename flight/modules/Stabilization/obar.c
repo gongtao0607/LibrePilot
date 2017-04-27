@@ -1,42 +1,28 @@
-/**
- ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief Virtual flybar mode
- * @note This file implements the logic for a virtual flybar
- * @{
- *
- * @file       obar.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      OpenFlybar by Tao Gong.
- *
- * @see        The GNU Public License (GPL) Version 3
- *
- *****************************************************************************/
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
-
 #include "openpilot.h"
 #include <pios_math.h>
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 
-int stabilization_obar(float gyro, float command, float *output, float dT, bool reinit, uint32_t axis, StabilizationSettingsData *settings)
+typedef struct{
+	int a;
+}OBarPIDData;
+
+static const pid_scaler scaler_1 = {.p=1.0f, .i=1.0f, .d=1.0f,};
+
+float stabilization_obar_axes(float command, float gyro, float dT, bool measuredDterm_enabled, bool reinit, uint32_t axis)
 {
-    *output = command + gyro * 0 + dT * 0 + reinit * 0 + axis * 0 + (int)settings * 0;
-    return 0;
+    (void)reinit;
+    command = boundf(command,
+        -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[axis],
+        StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[axis]
+    );
+    float output = pid_apply_setpoint(&stabSettings.innerPids[axis], &scaler_1, command, gyro, dT, measuredDterm_enabled);
+    return output;
+}
+
+float stabilization_obar_governor(float command, float sensor, bool reinit)
+{
+    (void)reinit;
+    (void)sensor;
+    return command;
 }
