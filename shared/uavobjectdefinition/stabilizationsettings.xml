@@ -9,8 +9,8 @@
 	    elements="6"
 	    defaultvalue="Bank1,Bank1,Bank1,Bank1,Bank1,Bank1"/>
 
-	<field name="OBarCyclicPID" units="" type="float" elementnames="Kp,Ki,Kd,SetpointWeight,Accel,Tau" defaultvalue="0.005,0.002,0,0.5,0,0.5"/>
-	<field name="OBarTailPID" units="" type="float" elementnames="Kp,Ki,Kd,SetpointWeight,Accel,Tau" defaultvalue="0.005,0.002,0,0.5,0,0"/>
+	<field name="OBarCyclic" units="" type="float" elementnames="SetpointWeight,Accel,Tau" defaultvalue="0.5,0,0.5"/>
+	<field name="OBarTail" units="" type="float" elementnames="SetpointWeight,Accel,Tau" defaultvalue="0.5,0,0"/>
 	<field name="OBarFeedforward" units="frac" type="float" elementnames="Collective2Tail, Cyclic2Tail, Collective2Elevator" defaultvalue="0,0,0"/>
 
 	<field name="VbarSensitivity" units="frac" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="0.5,0.5,0.5"/>
