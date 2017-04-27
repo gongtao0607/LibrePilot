@@ -96,6 +96,7 @@ void takeOffLocationHandlerInit();
     ENTRY(AXISLOCK) \
     ENTRY(WEAKLEVELING) \
     ENTRY(VIRTUALBAR) \
+    ENTRY(OBAR) \
     ENTRY(ACRO) \
     ENTRY(RATTITUDE) \
     ENTRY(ALTITUDEHOLD) \

@@ -176,6 +176,10 @@ static void StabilizationDesiredUpdatedCb(__attribute__((unused)) UAVObjEvent *e
             StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
             StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR;
             break;
+        case STABILIZATIONDESIRED_STABILIZATIONMODE_OBAR:
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_OBAR;
+            break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO:
             StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
             StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_ACRO;

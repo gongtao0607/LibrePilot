@@ -49,6 +49,7 @@
 
 #include <stabilization.h>
 #include <virtualflybar.h>
+#include <obar.h>
 #include <cruisecontrol.h>
 #include <sanitycheck.h>
 #if !defined(PIOS_EXCLUDE_ADVANCED_FEATURES)
@@ -297,6 +298,17 @@ static void stabilizationInnerloopTask()
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
                 stabilization_virtual_flybar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
                 break;
+            case STABILIZATIONSTATUS_INNERLOOP_OBAR:
+            {
+                rate[t] = boundf(rate[t],
+                                 -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
+                                 StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
+                                 );
+                stabilization_obar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
+                pid_scaler scaler = create_pid_scaler(t);
+                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], &scaler, rate[t], gyro_filtered[t], dT, measuredDterm_enabled);
+            }
+            break;
             case STABILIZATIONSTATUS_INNERLOOP_AXISLOCK:
                 if (fabsf(rate[t]) > stabSettings.settings.MaxAxisLockRate) {
                     // While getting strong commands act like rate mode
