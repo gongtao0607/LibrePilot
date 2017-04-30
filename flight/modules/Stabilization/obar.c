@@ -8,20 +8,10 @@ typedef struct{
 	int a;
 }OBarPIDData;
 
-static float tau_to_alpha(float tau)
+static float low_pass_filter(float*history, float value, float alpha)
 {
-    const float fakeDt = 0.0025f;
-    if(tau < 0.0001f) {
-        return 0;
-    } else {
-        return expf(-fakeDt / stabSettings.settings.OBarCyclic.Tau);
-    }
+    return (*history=(*history)*(1-alpha)+value*alpha);
 }
-/*static float low_pass_filter(float*history, float value, float tau)
-{
-    float alpha = tau_to_alpha(tau);
-    return (*history=((*history*alpha)+value*(1-alpha));
-}*/
 
 static const pid_scaler scaler_1 = {.p=1.0f, .i=1.0f, .d=1.0f,};
 
@@ -29,8 +19,7 @@ static float stabilization_obar_cyclic(float command, float gyro, float dT, bool
 {
     (void)reinit;
     float rate=StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[axis];
-    float decay_alpha = tau_to_alpha(stabSettings.settings.OBarCyclic.Tau);
-    stabSettings.innerPids[axis].iAccumulator*=decay_alpha;
+    stabSettings.innerPids[axis].iAccumulator*=stabSettings.settings.OBarCyclic.Decay;
     float setpoint_weight = stabSettings.settings.OBarCyclic.SetpointWeight;
     float command_forward = command * setpoint_weight;
     float output_back = pid_apply_setpoint(&stabSettings.innerPids[axis], &scaler_1, (command - command_forward) * rate,
@@ -41,21 +30,23 @@ static float stabilization_obar_cyclic(float command, float gyro, float dT, bool
 static float stabilization_obar_tail(float command, float gyro, float dT, bool measuredDterm_enabled, bool reinit, uint32_t axis)
 {
     (void)reinit;
+    (void)low_pass_filter;
+    static float command_lpf=0;
+    command = low_pass_filter(&command_lpf, command, stabSettings.settings.OBarTail.LowPassFilter);
     float rate=StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[axis];
-    if(stabSettings.settings.OBarTail.Tau > 0.0001f) {
-    //Tau is TIME CONSTANT in second, however we use 0 to disable it
-        float decay_alpha = tau_to_alpha(stabSettings.settings.OBarTail.Tau);
-        stabSettings.innerPids[axis].iAccumulator*=decay_alpha;
-    }
+    stabSettings.innerPids[axis].iAccumulator*=stabSettings.settings.OBarTail.Decay;
     float setpoint_weight = stabSettings.settings.OBarTail.SetpointWeight;
 
     float command_forward = command * setpoint_weight;
 
     float output_back = pid_apply_setpoint(&stabSettings.innerPids[axis], &scaler_1, (command - command_forward) * rate, gyro, dT, measuredDterm_enabled);
 
-    float collective;
+    float collective, roll, pitch;
     ManualControlCommandCollectiveGet(&collective);
-    float output_forward = fabsf(collective) * stabSettings.settings.OBarFeedforward.Collective2Tail;
+    ManualControlCommandRollGet(&roll);
+    ManualControlCommandPitchGet(&pitch);
+    float output_forward = fabsf(collective) * stabSettings.settings.OBarTail.CollectiveFeedforward;
+    //output_forward += (fabsf(roll) + fabsf(pitch)) * stabSettings.settings.OBarTail.CyclicFeedforward;
     return output_forward + output_back + command_forward;
 }
 
