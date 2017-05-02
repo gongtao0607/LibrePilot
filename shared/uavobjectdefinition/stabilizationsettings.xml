@@ -10,8 +10,9 @@
 	    defaultvalue="Bank1,Bank1,Bank1,Bank1,Bank1,Bank1"/>
 
 	<field name="OBarCyclic" units="" type="float" elementnames="SetpointWeight,Decay" defaultvalue="0.45,0.997"/>
-	<field name="OBarTail" units="" type="float" elementnames="SetpointWeight,Decay,CollectiveFeedforward,CyclicFeedforward,LowPassFilter" defaultvalue="0,1,0.3,0,1"/>
-	<field name="OBarExtra" units="" type="float" elementnames="A, B" defaultvalue="0,0"/>
+	<field name="OBarTail" units="" type="float" elementnames="SetpointWeight,Decay,CollectiveFeedforward,CyclicFeedforward,LowPassFilter,Acceleration,StopGain" defaultvalue="0,1,0.3,0,1,1,0"/>
+	<field name="OBarGovernor" units="" type="float" elementnames="Kp,Ki,StartupSpeed,GearRatio,SensorScale,HeadSpeed" defaultvalue="0,0,0,0,0,0"/>
+	<field name="OBarExtra" units="" type="float" elementnames="A, B, C, D" defaultvalue="0,0,0,0"/>
 
 	<field name="VbarSensitivity" units="frac" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="0.5,0.5,0.5"/>
 	<field name="VbarRollPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
