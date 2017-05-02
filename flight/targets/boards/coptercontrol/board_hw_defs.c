@@ -623,6 +623,18 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
             },
         },
     },
+    {//servo6 as input pin
+        .timer = TIM2,
+        .timer_chan = TIM_Channel_3,
+        .pin   = {
+            .gpio = GPIOA,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_2,
+                .GPIO_Mode  = GPIO_Mode_IPD,
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+    },
 };
 
 static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
@@ -700,7 +712,6 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
         },
     },
 };
-
 
 static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
     {
@@ -1402,6 +1413,22 @@ const struct pios_servo_cfg pios_servo_rcvr_cfg = {
     .num_channels = NELEMENTS(pios_tim_servoport_rcvrport_pins),
 };
 
+const struct pios_servo_cfg pios_servo_without_6_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_High,
+        .TIM_OCNPolarity  = TIM_OCPolarity_High,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+    },
+    //last channel used by input
+    .channels     = pios_tim_servoport_all_pins,
+    .num_channels = NELEMENTS(pios_tim_servoport_all_pins) - 1,
+};
+
 #endif /* PIOS_INCLUDE_SERVO && PIOS_INCLUDE_TIM */
 
 /*
@@ -1466,7 +1493,8 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
         .TIM_ICFilter    = 0x0,
     },
     .channels     = pios_tim_rcvrport_all_channels,
-    .num_channels = NELEMENTS(pios_tim_rcvrport_all_channels),
+    //exlude servo6 pin
+    .num_channels = NELEMENTS(pios_tim_rcvrport_all_channels) - 1,
 };
 
 const struct pios_pwm_cfg pios_pwm_with_ppm_cfg = {
@@ -1478,7 +1506,19 @@ const struct pios_pwm_cfg pios_pwm_with_ppm_cfg = {
     },
     /* Leave the first channel for PPM use and use the rest for PWM */
     .channels     = &pios_tim_rcvrport_all_channels[1],
-    .num_channels = NELEMENTS(pios_tim_rcvrport_all_channels) - 1,
+    //also exclude servo6 pin
+    .num_channels = NELEMENTS(pios_tim_rcvrport_all_channels) - 2,
+};
+
+const struct pios_pwm_cfg pios_pwm_with_servo6_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    .channels     = pios_tim_rcvrport_all_channels,
+    .num_channels = NELEMENTS(pios_tim_rcvrport_all_channels),
 };
 
 #endif /* if defined(PIOS_INCLUDE_PWM) */

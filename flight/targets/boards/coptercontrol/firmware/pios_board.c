@@ -720,6 +720,9 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rcvrport;
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
+    HwSettingsCC_Servo6InputOptions servo6input;
+    HwSettingsCC_Servo6InputGet(&servo6input);
+
     switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
 #if defined(PIOS_INCLUDE_HCSR04)
@@ -733,7 +736,11 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
-            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+            if(servo6input == HWSETTINGS_CC_SERVO6INPUT_ENABLED) {
+                PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_with_servo6_cfg);
+            } else {
+                PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+            }
 
             uint32_t pios_pwm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -815,7 +822,11 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
-        PIOS_Servo_Init(&pios_servo_cfg);
+        if(servo6input == HWSETTINGS_CC_SERVO6INPUT_ENABLED) {
+            PIOS_Servo_Init(&pios_servo_without_6_cfg);
+        } else {
+            PIOS_Servo_Init(&pios_servo_cfg);
+        }
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
