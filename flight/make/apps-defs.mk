@@ -99,6 +99,7 @@ SRC += $(PIOSCOMMON)/pios_sensors.c
 SRC += $(PIOSCOMMON)/pios_servo.c
 SRC += $(PIOSCOMMON)/pios_openlrs.c
 SRC += $(PIOSCOMMON)/pios_openlrs_rcvr.c
+SRC += $(PIOSCOMMON)/pios_rpm.c
 
 ## Misc library functions
 SRC += $(FLIGHTLIB)/sanitycheck.c

@@ -414,7 +414,7 @@ static void stabilizationInnerloopTask()
                 actuatorDesiredAxis[t] = cruisecontrol_apply_factor(rate[t]);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_OBAR:
-                actuatorDesiredAxis[t] = stabilization_obar_governor(rate[t], 0.0f, reinit);
+                actuatorDesiredAxis[t] = stabilization_obar_governor(rate[t], dT, measuredDterm_enabled, reinit);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

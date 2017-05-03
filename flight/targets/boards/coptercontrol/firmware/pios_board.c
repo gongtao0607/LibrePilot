@@ -233,6 +233,36 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
+#include "pios_rpm.h"
+static const struct pios_exti_cfg pios_exti_rpm_cfg = {
+    .vector = PIOS_RPM_IRQHandler,
+    .line   = EXTI_Line2,
+    .pin    = {
+        .gpio = GPIOA,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_2,
+            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Mode  = GPIO_Mode_IPD,
+        },
+    },
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = EXTI2_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .exti                                      = {
+        .init                                  = {
+            .EXTI_Line    = EXTI_Line2, // matches above GPIO pin
+            .EXTI_Mode    = EXTI_Mode_Interrupt,
+            .EXTI_Trigger = EXTI_Trigger_Rising,
+            .EXTI_LineCmd = ENABLE,
+        },
+    },
+};
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -720,8 +750,11 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rcvrport;
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
-    HwSettingsCC_Servo6InputOptions servo6input;
-    HwSettingsCC_Servo6InputGet(&servo6input);
+    HwSettingsCC_Servo6RPMOptions servo6rpm;
+    HwSettingsCC_Servo6RPMGet(&servo6rpm);
+    if(servo6rpm == HWSETTINGS_CC_SERVO6RPM_ENABLED) {
+        PIOS_EXTI_Init(&pios_exti_rpm_cfg);
+    }
 
     switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
@@ -736,11 +769,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
-            if(servo6input == HWSETTINGS_CC_SERVO6INPUT_ENABLED) {
-                PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_with_servo6_cfg);
-            } else {
-                PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
-            }
+            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
 
             uint32_t pios_pwm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -822,7 +851,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
-        if(servo6input == HWSETTINGS_CC_SERVO6INPUT_ENABLED) {
+        if(servo6rpm == HWSETTINGS_CC_SERVO6RPM_ENABLED) {
             PIOS_Servo_Init(&pios_servo_without_6_cfg);
         } else {
             PIOS_Servo_Init(&pios_servo_cfg);

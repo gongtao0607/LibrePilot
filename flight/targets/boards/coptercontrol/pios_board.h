@@ -239,7 +239,7 @@ extern uint32_t pios_com_mavlink_id;
 // Receiver PWM input
 // -------------------------
 #define PIOS_PWM_MAX_DEVS            1
-#define PIOS_PWM_NUM_INPUTS          7
+#define PIOS_PWM_NUM_INPUTS          6
 
 // -------------------------
 // Receiver DSM input

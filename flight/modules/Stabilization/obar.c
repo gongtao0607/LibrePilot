@@ -3,6 +3,7 @@
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 #include "manualcontrolcommand.h"
+#include <pios_rpm.h>
 
 static inline float low_pass_filter(float*history, float value, float alpha)
 {
@@ -65,9 +66,21 @@ float stabilization_obar_axes(float command, float gyro, float dT, bool measured
     }
 }
 
-float stabilization_obar_governor(float command, float sensor, bool reinit)
+static struct pid governorPid;
+void stabilization_obar_init()
+{
+    pid_zero(&governorPid);
+}
+
+float stabilization_obar_governor(float command, float dT, bool measuredDterm_enabled, bool reinit)
 {
     (void)reinit;
-    (void)sensor;
-    return command;
+    float currentRpm = PIOS_RPM_GetRPM();
+    if( command < 0.5f || currentRpm < 100.0f) return command;
+    StabilizationSettingsOBarGovernorData *obargovernor = &stabSettings.settings.OBarGovernor;
+    pid_configure(&governorPid, obargovernor->Kp, obargovernor->Ki, obargovernor->Kd, 1.0f);
+    float desiredRpm = obargovernor->HeadSpeed * obargovernor->GearRatio * obargovernor->SensorScale;
+
+    float output = command + pid_apply_setpoint(&governorPid, &scaler_111, desiredRpm, currentRpm, dT, measuredDterm_enabled);
+    return output;
 }
