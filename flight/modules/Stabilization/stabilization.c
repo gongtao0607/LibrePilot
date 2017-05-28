@@ -124,6 +124,7 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 static void StabilizationDesiredUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     StabilizationStatusData status;
+    StabilizationStatusGet(&status);
     StabilizationDesiredStabilizationModeData mode;
     int t;
 

@@ -19,10 +19,14 @@
 			<elementname>Thrust</elementname>
 		</elementnames>
 	</field>
+	<field name="OBarIntegral" units="" type="float" elementnames="Aileron,Elevator,Rudder,Throttle"/>
+	<field name="OBarHeadSpeed" units="" type="float" elements="1"/>
+	<field name="OBarExtras" units="" type="float" elementnames="A,B,C,D"/>
+
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="5000"/>
+        <telemetryflight acked="false" updatemode="periodic" period="500"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

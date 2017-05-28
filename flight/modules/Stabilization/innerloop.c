@@ -299,7 +299,7 @@ static void stabilizationInnerloopTask()
                 stabilization_virtual_flybar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_OBAR:
-                actuatorDesiredAxis[t] = stabilization_obar_axes(rate[t], gyro_filtered[t], dT, measuredDterm_enabled, reinit, t);
+                actuatorDesiredAxis[t] = stabilization_obar_axes(rate[t], gyro_filtered[t], dT, reinit, t);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_AXISLOCK:
                 if (fabsf(rate[t]) > stabSettings.settings.MaxAxisLockRate) {
@@ -414,7 +414,7 @@ static void stabilizationInnerloopTask()
                 actuatorDesiredAxis[t] = cruisecontrol_apply_factor(rate[t]);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_OBAR:
-                actuatorDesiredAxis[t] = stabilization_obar_governor(rate[t], dT, measuredDterm_enabled, reinit);
+                actuatorDesiredAxis[t] = stabilization_obar_governor(rate[t], dT, reinit);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

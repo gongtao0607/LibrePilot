@@ -181,7 +181,7 @@
 #endif
 #define PIOS_TELEM_RX_STACK_SIZE        410
 #define PIOS_TELEM_TX_STACK_SIZE        560
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 95
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 105
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10
